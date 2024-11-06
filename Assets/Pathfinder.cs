@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Pathfinder : MonoBehaviour
 {
-    [SerializeField] GameObject startNode, targetNode, currentNode, destinationNode;
-    [SerializeField] List<GameObject> previousNode;
+    [SerializeField] GameObject startNode, endNode, targetNode, currentNode, destinationNode;
+    [SerializeField] List<GameObject> previousNode, waypointNode;
     [SerializeField] int previousNumber = 5;
+
+    int waypointIndex;
 
     // Start is called before the first frame update
     void Start()
@@ -14,6 +17,15 @@ public class Pathfinder : MonoBehaviour
         transform.position = startNode.transform.position;
         currentNode = startNode;
         targetNode = currentNode;
+
+        if (waypointNode.Count > 0)
+        {
+            destinationNode = waypointNode[waypointIndex];
+        }
+        else
+        {
+            destinationNode = endNode;
+        }
     }
 
     // Update is called once per frame
@@ -21,6 +33,30 @@ public class Pathfinder : MonoBehaviour
     {
         if (Vector3.Distance(transform.position, targetNode.transform.position) < 0.2f)
         {
+            if (targetNode == destinationNode)
+            {
+                if (waypointNode.Count > 0)
+                {
+                    waypointIndex++;
+                    if (waypointIndex >= waypointNode.Count)
+                    {
+                        waypointIndex = 0;
+                    }
+                    destinationNode = waypointNode[waypointIndex];
+                }
+                else
+                {
+                    if (destinationNode == endNode)
+                    {
+                        destinationNode = startNode;
+                    }
+                    else
+                    {
+                        destinationNode = endNode;
+                    }                    
+                }                
+            }
+            
             previousNode.Add(currentNode);
             if (previousNode.Count > previousNumber)
             {
